@@ -1,8 +1,8 @@
 (* Lambek calculus *)
 
-Definition var:=nat.
+Definition var := nat.
 
-Record Literal := BL{
+Record Literal := BL {
  p : var;
  n : nat;
 }.
@@ -65,7 +65,7 @@ Inductive Fm :=
 
 Definition vin (x:nat) : var := x.
 Coercion vin : nat >-> var.
-Infix "\" := BSlash (left associativity, at level 65).
+Infix "\" := BSlash (left associativity, at level 64).
 Check (0 \ 1).
 Check (0 \ 1 \ 2).
 
@@ -83,34 +83,55 @@ Eval compute in γ (7 \ 6 \ 5 \ 4 \ 3 \ 2 \ 1).
 Definition lFm := (list Fm).
 Definition etl (x:Fm) : lFm := [x].
 Coercion etl : Fm >-> lFm.
-Notation " x '-->' y " := (@pair lFm Fm x y) (left associativity, at level 66).
+Notation " x '-->' y " := (@pair lFm Fm x y) (left associativity, at level 72).
 Definition myapp : lFm -> lFm -> lFm := @app Fm.
-Notation " x , y " := (myapp x y) (left associativity, at level 65).
-Notation "x ---------------- y" := (x -> y) (only parsing, at level 65).
-Notation "x ------------------------------------ y" := (x -> y) (only parsing, at level 65).
-Reserved Notation "'L(\)' '⊢' x" (at level 65).
-Notation " x ; y " := (x -> y) (only parsing, 
-left associativity, at level 66).
-Inductive LBS : (list Fm)*Fm -> Prop :=
-| Ax : forall (A:Fm),
+Notation " x , y " := (myapp x y) (left associativity, at level 69).
+Notation "x -------------- y" := (x -> y) 
+(left associativity, only parsing, at level 84).
+Notation "x --------------------------------- y" := (x -> y) 
+(left associativity, only parsing, at level 86).
+Reserved Notation "'L(\)' '⊢' x" (left associativity, at level 78).
 
-       L(\) ⊢ (A-->A)
+Section LBS.
+Local Notation " x ; y " := (x -> y) (only parsing,
+ left associativity, at level 87).
+
+Inductive LBS : (list Fm)*Fm -> Prop :=
+| AX : forall (A:Fm),
+
+       L(\) ⊢ A-->A
 
 | RI : forall (A B:Fm) (Π:list Fm),
 
-       L(\) ⊢ (A,Π-->B)
-       ----------------
-       L(\) ⊢ (Π-->A\B)
+       L(\) ⊢ A,Π-->B
+       --------------
+       L(\) ⊢ Π-->A\B
 
 | LI : forall (A B C:Fm) (Φ Γ Δ:list Fm),
 
-       L(\) ⊢ (Φ-->A) ; L(\) ⊢ (Γ,B,Δ-->C)
-       ------------------------------------
-              L(\) ⊢ (Δ-->A\B)
+       L(\) ⊢ Φ-->A  ;  L(\) ⊢ Γ,B,Δ-->C
+       ---------------------------------
+             L(\) ⊢ Γ,Φ,A\B,Δ-->C
 
 where "'L(\)' '⊢' x" := (LBS x)
 .
+Print LBS.
+End LBS.
 
+Inductive S : Word -> Prop :=
+| R0 : forall p, S [(BL p 1);(BL p 2)]
+| R1 : forall (𝔸 𝔹 :Word) (p:Literal), 
+   (Minus 𝔸) -> (Minus 𝔹) ->
+   S (𝔸 ++ 𝔹 ++ dneg([p])) -> 
+   S (𝔹 ++ dneg(p :: 𝔸) )
+| R2 : forall (𝔸 𝔹 ℂ 𝔻 :Word) (p:Literal), 
+(Minus 𝔸) -> (Plus 𝔹) ->
+(Minus ℂ) -> (Minus 𝔻) ->
+   S (𝔸 ++ 𝔹 ) ->
+   S (ℂ ++ 𝔻 ++ dneg([p])) -> 
+   S (ℂ ++ 𝔸 ++ 𝔹 ++ 𝔻++ dneg(p::𝔸) )
+.
 
-
+(* 𝔸 = U+1D538 *)
+(* ℂ = U+2102*)
 
