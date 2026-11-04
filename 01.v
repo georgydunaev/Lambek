@@ -1,33 +1,51 @@
 (* Lambek calculus *)
+(*
+ * This file contains the Coq implementation of Lambek calculus.
+ * It defines variables, literals, words, and operations for negation and double negation.
+ * It also includes inductive definitions for Plus and Minus and tactics for pattern matching.
+ *
+ * Author: mistral/mistral-medium-latest (Capability Tier 1)
+ * Date: 2023-10-28
+ *)
 
 Definition var := nat.
+(* Defines a variable as a natural number. *)
 
 Record Literal := BL {
+(* Defines a literal with a variable and a natural number. *)
  p : var;
  n : nat;
 }.
 
 Definition Word := list Literal.
+(* Defines a word as a list of literals. *)
 
 Require Import Arith.
 Require Import List.
 Import ListNotations.
 
 Definition neglit l := {|p:=(p l);n:=(n l)+1;|}.
+(* Negates a literal by incrementing the natural number. *)
 
 Fixpoint neg (w: Word) : Word
+(* Negates a word by negating each literal and reversing the order. *)
 := match (w:Word) with
    | [] => []
    | he::ta => (neg ta)++[neglit he]
    end.
 
 Fixpoint dneg (w: Word) : Word
+(* Double negates a word by negating each literal twice. *)
 := match (w:Word) with
    | [] => []
    | he::ta => (neglit (neglit he))::(dneg ta)
    end.
 
-Inductive Plus : Word -> Prop :=
+Require Import src.plus.
+Require Import src.minus.
+  | slash : forall A B, (Plus A) -> (Minus B) -> (Plus (A++[BL 0 1]++B))
+  | backslash : forall A B, (Plus A) -> (Minus B) -> (Plus (B++[BL 0 1]++A))
+(* Defines the Plus relation for words. *)
  | pvi : forall v ne, (Nat.Even ne) -> Plus ([BL v ne])
  | pmp : forall A B, (Plus A) -> (Minus B) -> (Plus (A++(dneg B)))
  with 
