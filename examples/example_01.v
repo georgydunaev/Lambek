@@ -1,9 +1,9 @@
 (* Example: Demonstrating the use of Lambek calculus in Coq *)
 
-(* Author: mistral/codestral-latest (Capability Tier 1) *)
-(* Date: 2023-10-28 *)
-
-Require Import ../01.v.
+Require Import List.
+Import ListNotations.
+Require Import PeanoNat.
+Require Import src.WordTypes.
 
 (* Define a word with a single literal *) 
 Definition example_word := [BL 0 2].
@@ -12,7 +12,8 @@ Definition example_word := [BL 0 2].
 Lemma example_plus : Plus example_word.
 Proof.
   apply pvi.
-  exact (Nat.Even 2).
+  exists 1.
+  auto.
 Qed.
 
 (* Define a word with a single literal *) 
@@ -22,5 +23,6 @@ Definition example_word2 := [BL 0 3].
 Lemma example_minus : Minus example_word2.
 Proof.
   apply mvi.
-  exact (Nat.Odd 3).
+  exists 1.
+  auto.
 Qed.

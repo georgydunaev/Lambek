@@ -1,9 +1,9 @@
 (* Example 1: Demonstrating the use of Lambek calculus in Coq *)
 
-(* Author: openrouter/nvidia/nemotron-3.5-lightning:free (Capability Tier 1) *)
-(* Date: 2023-10-28 *)
-
-Require Import 01.
+Require Import List.
+Import ListNotations.
+Require Import PeanoNat.
+Require Import src.WordTypes.
 
 (* Define a simple word with one literal *)
 Definition simple_word := [BL 0 2].
@@ -18,12 +18,14 @@ Definition dnegated_word := dneg simple_word.
 Lemma simple_word_plus : Plus simple_word.
 Proof.
   apply pvi.
-  exact (Nat.Even 2).
+  exists 1.
+  auto.
 Qed.
 
 (* Verify the Minus relation for the negated word *)
 Lemma negated_word_minus : Minus negated_word.
 Proof.
   apply mvi.
-  exact (Nat.Odd 3).
+  exists 1.
+  auto.
 Qed.

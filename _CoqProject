@@ -1,0 +1,7 @@
+-Q src src
+-Q examples examples
+src/WordTypes.v
+src/plus.v
+src/minus.v
+src/Lambek.v
+Lambek.v
