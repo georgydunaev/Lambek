@@ -51,7 +51,7 @@ class Lexicon:
             lex.add_entry(name, Atom("np"))
 
         # Common nouns
-        for noun in ("cat", "dog", "mat", "problem", "theorem", "logician", "book", "sentence"):
+        for noun in ("cat", "dog", "mat", "problem", "theorem", "logician", "book", "sentence", "apples", "man"):
             lex.add_entry(noun, Atom("n"))
 
         # Determiners
@@ -63,11 +63,11 @@ class Lexicon:
             lex.add_entry(adj, Slash(Atom("n"), Atom("n")))  # n / n
 
         # Intransitive verbs: np \ s
-        for iv in ("slept", "ran", "walked", "smiled"):
+        for iv in ("slept", "ran", "walked", "smiled", "fell"):
             lex.add_entry(iv, Backslash(Atom("np"), Atom("s")))
 
         # Transitive verbs: (np \ s) / np
-        for tv in ("likes", "loves", "saw", "solved", "proved", "read", "chased"):
+        for tv in ("likes", "loves", "saw", "solved", "proved", "read", "chased", "wrote"):
             lex.add_entry(tv, Slash(Backslash(Atom("np"), Atom("s")), Atom("np")))
 
         # Ditransitive verbs: ((np \ s) / np) / np
@@ -83,6 +83,44 @@ class Lexicon:
                 prep,
                 Slash(Backslash(Backslash(Atom("np"), Atom("s")), Backslash(Atom("np"), Atom("s"))), Atom("np")),
             )
+
+        # Relative pronouns
+        # Subject extraction: (n \ n) / (np \ s)
+        for rel_subj in ("who", "which", "that"):
+            lex.add_entry(
+                rel_subj,
+                Slash(Backslash(Atom("n"), Atom("n")), Backslash(Atom("np"), Atom("s"))),
+            )
+        # Object extraction: (n \ n) / (s / np)
+        for rel_obj in ("whom", "which", "that"):
+            lex.add_entry(
+                rel_obj,
+                Slash(Backslash(Atom("n"), Atom("n")), Slash(Atom("s"), Atom("np"))),
+            )
+
+        # Conjunctions (polytypic coordination)
+        # Sentential coordination: (s \ s) / s
+        for conj in ("and", "or", "but"):
+            lex.add_entry(conj, Slash(Backslash(Atom("s"), Atom("s")), Atom("s")))
+
+        # Noun phrase coordination: (np \ np) / np
+        for conj in ("and", "or"):
+            lex.add_entry(conj, Slash(Backslash(Atom("np"), Atom("np")), Atom("np")))
+
+        # Verb phrase coordination: ((np \ s) \ (np \ s)) / (np \ s)
+        vp = Backslash(Atom("np"), Atom("s"))
+        for conj in ("and", "or"):
+            lex.add_entry(conj, Slash(Backslash(vp, vp), vp))
+
+        # Transitive verb coordination: (tv \ tv) / tv where tv = (np \ s) / np
+        tv = Slash(Backslash(Atom("np"), Atom("s")), Atom("np"))
+        for conj in ("and", "or"):
+            lex.add_entry(conj, Slash(Backslash(tv, tv), tv))
+
+        # Right Node Raising coordination: ((s / np) \ (s / np)) / (s / np)
+        s_slash_np = Slash(Atom("s"), Atom("np"))
+        for conj in ("and", "or"):
+            lex.add_entry(conj, Slash(Backslash(s_slash_np, s_slash_np), s_slash_np))
 
         return lex
 

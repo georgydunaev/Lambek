@@ -28,6 +28,11 @@ from .prover import (
     ProofNode,
     prove_sequent,
 )
+from .cut_elimination import (
+    admit_cut,
+    CutProofNode,
+    eliminate_all_cuts,
+)
 from .grammar import (
     Lexicon,
     GrammarDerivation,
@@ -53,6 +58,9 @@ __all__ = [
     "LambekProver",
     "ProofNode",
     "prove_sequent",
+    "admit_cut",
+    "CutProofNode",
+    "eliminate_all_cuts",
     "Lexicon",
     "GrammarDerivation",
     "parse_sentence",

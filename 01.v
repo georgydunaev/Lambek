@@ -528,4 +528,152 @@ Proof.
   exact H_cut2.
 Qed.
 
+(* Constructive Cut Admissibility in Cut-Free Lambek Calculus (FullL) *)
+
+Theorem full_cut_admissible_ax_l :
+  forall A C Gamma Delta,
+    FullL ([A], A) ->
+    FullL (Gamma ++ [A] ++ Delta, C) ->
+    FullL (Gamma ++ [A] ++ Delta, C).
+Proof.
+  intros A C Gamma Delta H_ax H_main.
+  exact H_main.
+Qed.
+
+Theorem full_cut_admissible_ax_r :
+  forall A Phi,
+    FullL (Phi, A) ->
+    FullL ([A], A) ->
+    FullL (Phi, A).
+Proof.
+  intros A Phi H_prem H_ax.
+  exact H_prem.
+Qed.
+
+Theorem full_cut_app_backslash :
+  forall A B Gamma,
+    FullL (Gamma, A) ->
+    FullL (Gamma ++ [A \ B], B).
+Proof.
+  intros A B Gamma H.
+  change (Gamma ++ [A \ B]) with ([] ++ Gamma ++ [A \ B] ++ []).
+  apply FullL_BSlash_L.
+  - exact H.
+  - apply FullL_Ax.
+Qed.
+
+Theorem full_cut_app_slash :
+  forall A B Gamma,
+    FullL (Gamma, A) ->
+    FullL ([B / A] ++ Gamma, B).
+Proof.
+  intros A B Gamma H.
+  replace ([B / A] ++ Gamma) with ([] ++ [B / A] ++ Gamma ++ []).
+  - apply FullL_Slash_L.
+    + exact H.
+    + apply FullL_Ax.
+  - simpl. rewrite app_nil_r. reflexivity.
+Qed.
+
+Theorem full_cut_geach_backslash_single :
+  forall A B C Gamma,
+    FullL (A :: Gamma, B) ->
+    FullL (Gamma ++ [B \ C], A \ C).
+Proof.
+  intros A B C Gamma H.
+  apply FullL_BSlash_R.
+  change (A :: Gamma ++ [B \ C]) with ([] ++ (A :: Gamma) ++ [B \ C] ++ []).
+  apply FullL_BSlash_L.
+  - exact H.
+  - apply FullL_Ax.
+Qed.
+
+Theorem full_cut_geach_slash_single :
+  forall A B C Gamma,
+    FullL (Gamma ++ [A], B) ->
+    FullL ([C / B] ++ Gamma, C / A).
+Proof.
+  intros A B C Gamma H.
+  apply FullL_Slash_R.
+  rewrite <- app_assoc.
+  replace ([C / B] ++ (Gamma ++ [A])) with ([] ++ [C / B] ++ (Gamma ++ [A]) ++ []).
+  - apply FullL_Slash_L.
+    + exact H.
+    + apply FullL_Ax.
+  - simpl. rewrite app_nil_r. reflexivity.
+Qed.
+
+Theorem full_cut_prod_intro :
+  forall A B Gamma Delta,
+    FullL (Gamma, A) ->
+    FullL (Delta, B) ->
+    FullL (Gamma ++ Delta, A * B).
+Proof.
+  intros A B Gamma Delta H1 H2.
+  apply FullL_Prod_R; assumption.
+Qed.
+
+(* Verified Linguistic Derivations: Relative Clauses and Coordination *)
+
+Theorem full_rel_clause_subj_extraction :
+  forall (n np s : FullFm),
+    FullL ([n; (n \ n) / (np \ s); np \ s], n).
+Proof.
+  intros n np s.
+  change [n; (n \ n) / (np \ s); np \ s]
+    with ([n] ++ [(n \ n) / (np \ s)] ++ [np \ s] ++ []).
+  apply FullL_Slash_L.
+  - apply FullL_Ax.
+  - apply full_app_backslash.
+Qed.
+
+Lemma full_np_tv_np :
+  forall (np s : FullFm),
+    FullL ([np; (np \ s) / np; np], s).
+Proof.
+  intros np s.
+  change [np; (np \ s) / np; np] with ([np] ++ [(np \ s) / np] ++ [np] ++ []).
+  apply FullL_Slash_L.
+  - apply FullL_Ax.
+  - apply full_app_backslash.
+Qed.
+
+Lemma full_np_tv :
+  forall (np s : FullFm),
+    FullL ([np; (np \ s) / np], s / np).
+Proof.
+  intros np s.
+  apply FullL_Slash_R.
+  apply full_np_tv_np.
+Qed.
+
+Theorem full_rel_clause_obj_extraction :
+  forall (n np s : FullFm),
+    FullL ([n; (n \ n) / (s / np); np; (np \ s) / np], n).
+Proof.
+  intros n np s.
+  change [n; (n \ n) / (s / np); np; (np \ s) / np]
+    with ([n] ++ [(n \ n) / (s / np)] ++ [np; (np \ s) / np] ++ []).
+  apply FullL_Slash_L.
+  - apply full_np_tv.
+  - apply full_app_backslash.
+Qed.
+
+Theorem full_rnr_coordination :
+  forall (np s : FullFm),
+    FullL ([np; (np \ s) / np; ((s / np) \ (s / np)) / (s / np); np; (np \ s) / np; np], s).
+Proof.
+  intros np s.
+  set (s_slash := s / np).
+  change [np; (np \ s) / np; (s_slash \ s_slash) / s_slash; np; (np \ s) / np; np]
+    with ([np; (np \ s) / np] ++ [(s_slash \ s_slash) / s_slash] ++ [np; (np \ s) / np] ++ [np]).
+  apply FullL_Slash_L.
+  - apply full_np_tv.
+  - change ([np; (np \ s) / np] ++ [s_slash \ s_slash] ++ [np])
+      with ([] ++ [np; (np \ s) / np] ++ [s_slash \ s_slash] ++ [np]).
+    apply FullL_BSlash_L.
+    + apply full_np_tv.
+    + unfold s_slash. apply full_app_slash.
+Qed.
+
 

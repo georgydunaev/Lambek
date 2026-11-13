@@ -277,6 +277,154 @@ Proof.
   exact H_cut2.
 Qed.
 
+(* Constructive Cut Admissibility in Cut-Free Lambek Calculus (L) *)
+
+Theorem cut_admissible_ax_l :
+  forall (A C : Fm) (Gamma Delta : list Fm),
+    L ([A], A) ->
+    L (Gamma ++ [A] ++ Delta, C) ->
+    L (Gamma ++ [A] ++ Delta, C).
+Proof.
+  intros A C Gamma Delta H_ax H_main.
+  exact H_main.
+Qed.
+
+Theorem cut_admissible_ax_r :
+  forall (A : Fm) (Phi : list Fm),
+    L (Phi, A) ->
+    L ([A], A) ->
+    L (Phi, A).
+Proof.
+  intros A Phi H_prem H_ax.
+  exact H_prem.
+Qed.
+
+Theorem cut_app_backslash :
+  forall (A B : Fm) (Gamma : list Fm),
+    L (Gamma, A) ->
+    L (Gamma ++ [A \ B], B).
+Proof.
+  intros A B Gamma H.
+  change (Gamma ++ [A \ B]) with ([] ++ Gamma ++ [A \ B] ++ []).
+  apply L_BSlash_L.
+  - exact H.
+  - apply L_Ax.
+Qed.
+
+Theorem cut_app_slash :
+  forall (A B : Fm) (Gamma : list Fm),
+    L (Gamma, A) ->
+    L ([B / A] ++ Gamma, B).
+Proof.
+  intros A B Gamma H.
+  replace ([B / A] ++ Gamma) with ([] ++ [B / A] ++ Gamma ++ []).
+  - apply L_Slash_L.
+    + exact H.
+    + apply L_Ax.
+  - simpl. rewrite app_nil_r. reflexivity.
+Qed.
+
+Theorem cut_geach_backslash_single :
+  forall (A B C : Fm) (Gamma : list Fm),
+    L (A :: Gamma, B) ->
+    L (Gamma ++ [B \ C], A \ C).
+Proof.
+  intros A B C Gamma H.
+  apply L_BSlash_R.
+  change (A :: Gamma ++ [B \ C]) with ([] ++ (A :: Gamma) ++ [B \ C] ++ []).
+  apply L_BSlash_L.
+  - exact H.
+  - apply L_Ax.
+Qed.
+
+Theorem cut_geach_slash_single :
+  forall (A B C : Fm) (Gamma : list Fm),
+    L (Gamma ++ [A], B) ->
+    L ([C / B] ++ Gamma, C / A).
+Proof.
+  intros A B C Gamma H.
+  apply L_Slash_R.
+  rewrite <- app_assoc.
+  replace ([C / B] ++ (Gamma ++ [A])) with ([] ++ [C / B] ++ (Gamma ++ [A]) ++ []).
+  - apply L_Slash_L.
+    + exact H.
+    + apply L_Ax.
+  - simpl. rewrite app_nil_r. reflexivity.
+Qed.
+
+Theorem cut_prod_intro :
+  forall (A B : Fm) (Gamma Delta : list Fm),
+    L (Gamma, A) ->
+    L (Delta, B) ->
+    L (Gamma ++ Delta, A * B).
+Proof.
+  intros A B Gamma Delta H1 H2.
+  apply L_Prod_R; assumption.
+Qed.
+
+(* Linguistic Derivations: Relative Clauses and Coordination *)
+
+Theorem rel_clause_subj_extraction :
+  forall (n np s : Fm),
+    L ([n; (n \ n) / (np \ s); np \ s], n).
+Proof.
+  intros n np s.
+  change [n; (n \ n) / (np \ s); np \ s]
+    with ([n] ++ [(n \ n) / (np \ s)] ++ [np \ s] ++ []).
+  apply L_Slash_L.
+  - apply L_Ax.
+  - apply app_backslash.
+Qed.
+
+Lemma np_tv_np :
+  forall (np s : Fm),
+    L ([np; (np \ s) / np; np], s).
+Proof.
+  intros np s.
+  change [np; (np \ s) / np; np] with ([np] ++ [(np \ s) / np] ++ [np] ++ []).
+  apply L_Slash_L.
+  - apply L_Ax.
+  - apply app_backslash.
+Qed.
+
+Lemma np_tv :
+  forall (np s : Fm),
+    L ([np; (np \ s) / np], s / np).
+Proof.
+  intros np s.
+  apply L_Slash_R.
+  apply np_tv_np.
+Qed.
+
+Theorem rel_clause_obj_extraction :
+  forall (n np s : Fm),
+    L ([n; (n \ n) / (s / np); np; (np \ s) / np], n).
+Proof.
+  intros n np s.
+  change [n; (n \ n) / (s / np); np; (np \ s) / np]
+    with ([n] ++ [(n \ n) / (s / np)] ++ [np; (np \ s) / np] ++ []).
+  apply L_Slash_L.
+  - apply np_tv.
+  - apply app_backslash.
+Qed.
+
+Theorem rnr_coordination :
+  forall (np s : Fm),
+    L ([np; (np \ s) / np; ((s / np) \ (s / np)) / (s / np); np; (np \ s) / np; np], s).
+Proof.
+  intros np s.
+  set (s_slash := s / np).
+  change [np; (np \ s) / np; (s_slash \ s_slash) / s_slash; np; (np \ s) / np; np]
+    with ([np; (np \ s) / np] ++ [(s_slash \ s_slash) / s_slash] ++ [np; (np \ s) / np] ++ [np]).
+  apply L_Slash_L.
+  - apply np_tv.
+  - change ([np; (np \ s) / np] ++ [s_slash \ s_slash] ++ [np])
+      with ([] ++ [np; (np \ s) / np] ++ [s_slash \ s_slash] ++ [np]).
+    apply L_BSlash_L.
+    + apply np_tv.
+    + unfold s_slash. apply app_slash.
+Qed.
+
 (* Section 3: Non-Associative Lambek Calculus NL with Tree Antecedents *)
 
 Inductive Tree : Type :=

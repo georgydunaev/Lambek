@@ -89,11 +89,37 @@ for d in derivations:
 
 ---
 
-## Running Tests
+## Interactive CLI and Visualizer (`tools/lambek_prover.py`)
 
-Run the complete test suite with Python's unittest runner:
+The repository includes a command-line tool for proving sequents, visualizing Gentzen-style deduction trees, exporting LaTeX bussproofs code, parsing natural language sentences, and demonstrating constructive cut elimination:
 
 ```bash
+# Prove a sequent with horizontal Gentzen deduction lines:
+python3 tools/lambek_prover.py --prove "np, (np \ s) / np, np |- s" --horizontal
+
+# Export proof tree to LaTeX (bussproofs format):
+python3 tools/lambek_prover.py --prove "np, (np \ s) / np, np |- s" --latex
+
+# Parse natural language sentences (supports Right Node Raising and relative clauses):
+python3 tools/lambek_prover.py --parse "john likes and mary loves alice"
+python3 tools/lambek_prover.py --parse "book which john read" --target "n"
+
+# Demonstrate constructive cut elimination between two derivations:
+python3 tools/lambek_prover.py --cut "np, (np \ s) / np |- s / np" "s / np, np |- s"
+
+# Launch interactive REPL mode:
+python3 tools/lambek_prover.py --interactive
+```
+
+---
+
+## Running Tests
+
+Run the complete test suite with Python's unittest runner or via `run_tests.py`:
+
+```bash
+python3 run_tests.py
+# or:
 PYTHONPATH=. python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
