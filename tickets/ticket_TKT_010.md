@@ -1,8 +1,9 @@
 # [LAMBEK] Ticket TKT-010 — Mechanize Pentus's Theorem for Context-Free Grammars and Lambek Calculus in Python/Coq
 
 **Repository:** `Lambek`  
-**Status:** `OPEN`  
+**Status:** `RESOLVED`  
 **Created:** `2026-11-13T22:40:00Z`  
+**Resolved:** `2026-11-13T23:45:00Z`  
 **Author:** `Lambek Calculus and Categorial Proof Specialist`  
 
 ## Problem Description
@@ -13,13 +14,19 @@
    - Algorithms to verify language equivalence between CFG parsing charts and Lambek sequent derivations.
    - Formal Coq definitions for context-free grammars and their embeddings into Lambek type reductions.
 
-## Resolution Plan
-1. Implement in `lambek/pentus.py`:
-   - Data structures for Context-Free Grammars (Variables, Terminals, Production Rules in Chomsky Normal Form).
-   - Translation from CFG productions (A -> B C and A -> a) into Lambek categorial types using the Gaifman-Kazimierz construction.
-   - Earley / CKY parser for CFGs cross-checked against Lambek backward-chaining derivations.
-   - Interpolation and translation algorithms representing the syntactic concept lattices underlying Pentus's proof.
-2. Formalize in Coq (`src/Pentus.v` or `src/Lambek.v`):
-   - Inductive definitions of context-free languages and Chomsky-Bar-Hillel derivation systems.
-   - Soundness of AB reduction within cut-free Lambek calculus L.
-3. Add automated test coverage in `tests/test_pentus.py` verifying equivalence on standard formal languages (Dyck languages, palindromes, linguistic phrase structures).
+## Resolution Summary
+1. Implemented `lambek/pentus.py`:
+   - Data structures for Context-Free Grammars: `Variable`, `Terminal`, `ProductionRule` (validated for Chomsky Normal Form), and `CFG`.
+   - Dynamic programming Cocke-Younger-Kasami (CKY) chart parser with backpointer extraction for full parse trees (`CKYParser`, `CKYChart`, `ParseTree`).
+   - Classical Gaifman-Kazimierz construction (`cnf_to_gaifman_kazimierz`) translating CNF productions into bidirectional categorial types (left slash functors A / C and right backslash functors B \\ A).
+   - Automated cross-checker (`cross_check_cfg_lambek`) verifying equivalence between CKY recognition charts and Lambek backward-chaining sequent derivations.
+   - Craig-Maehara-Roorda-Pentus interpolation algorithm (`pentus_interpolate`) computing interpolants for cut-free Lambek sequents.
+   - Formal Concept Analysis modeling syntactic distribution (`SyntacticConcept`, `SyntacticConceptLattice`).
+   - Pentus CFG extraction (`lambek_to_cfg`) synthesizing equivalent Chomsky Normal Form CFGs from Lambek categorial lexicons.
+2. Formalized in Coq (`src/Pentus.v`):
+   - Inductive definitions of Context-Free Grammars (`CfgRule`, `cfg_derives`, `cfg_language`).
+   - Inductive definition of Ajdukiewicz-Bar-Hillel derivation trees and reductions (`AB_Tree`, `ab_derives`, `AB_reduce`).
+   - Soundness of AB reductions in cut-free Lambek calculus L (`ab_step_slash_sound`, `ab_step_backslash_sound`, `ab_lexical_slash_sound`, `ab_lexical_backslash_sound`) and in `L_Cut` (`ab_sound_in_L_cut`, `AB_reduce_sound_in_L_Cut`).
+   - Soundness of Gaifman-Kazimierz embeddings (`gk_rule_slash_sound`, `gk_rule_backslash_sound`, `gk_chain_sound`).
+   - Verified clean compilation with `coqc`.
+3. Created comprehensive unit test suite in `tests/test_pentus.py` (15 unit tests covering CNF data structures, CKY parsing, Dyck languages, Gaifman-Kazimierz translation, cross-checking, Pentus interpolation, concept lattices, and Lambek-to-CFG extraction). Full test suite passes 100% (60 tests across repository).

@@ -43,6 +43,21 @@ from .countermodel import (
     find_countermodel,
     evaluate_language,
 )
+from .pentus import (
+    Variable,
+    Terminal,
+    ProductionRule,
+    ParseTree,
+    CFG,
+    CKYChart,
+    CKYParser,
+    cnf_to_gaifman_kazimierz,
+    cross_check_cfg_lambek,
+    pentus_interpolate,
+    SyntacticConcept,
+    SyntacticConceptLattice,
+    lambek_to_cfg,
+)
 
 __all__ = [
     "Type",
@@ -67,4 +82,17 @@ __all__ = [
     "Countermodel",
     "find_countermodel",
     "evaluate_language",
+    "Variable",
+    "Terminal",
+    "ProductionRule",
+    "ParseTree",
+    "CFG",
+    "CKYChart",
+    "CKYParser",
+    "cnf_to_gaifman_kazimierz",
+    "cross_check_cfg_lambek",
+    "pentus_interpolate",
+    "SyntacticConcept",
+    "SyntacticConceptLattice",
+    "lambek_to_cfg",
 ]

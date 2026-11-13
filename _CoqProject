@@ -4,4 +4,5 @@ src/WordTypes.v
 src/plus.v
 src/minus.v
 src/Lambek.v
+src/Pentus.v
 Lambek.v
